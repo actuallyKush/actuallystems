@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "actuallystems"
+version = "1.0.0"
+description = "A free CLI tool for music producers to separate audio into stems"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "demucs>=4.0.0",
+    "yt-dlp>=2024.0.0",
+    "rich>=13.0.0",
+    "torch>=2.0.0",
+    "torchaudio>=2.0.0",
+    "numpy<2",
+]
+
+[project.scripts]
+actuallystems = "stems_package.__main__:main"
+
+[project.urls]
+Homepage = "https://github.com/actuallyKush/actuallystems"
+
+[tool.setuptools]
+packages = ["stems_package"]
