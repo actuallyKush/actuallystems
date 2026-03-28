@@ -2,17 +2,6 @@ import os
 import subprocess
 import sys
 
-# Fix SSL certificate issues on macOS - use certifi bundle (global fix)
-if sys.platform == "darwin":
-    try:
-        import certifi
-        cert_path = certifi.where()
-        os.environ['SSL_CERT_FILE'] = cert_path
-        os.environ['REQUESTS_CA_BUNDLE'] = cert_path
-        os.environ['CURL_CA_BUNDLE'] = cert_path
-    except ImportError:
-        pass
-
 from pathlib import Path
 from typing import List, Dict, Optional
 
@@ -28,15 +17,7 @@ class StemSeparator:
         self.output_format = output_format
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
         
-        # For macOS, add SSL env vars to subprocess
         self.env = os.environ.copy()
-        if sys.platform == "darwin":
-            try:
-                import certifi
-                self.env['SSL_CERT_FILE'] = certifi.where()
-                self.env['REQUESTS_CA_BUNDLE'] = certifi.where()
-            except ImportError:
-                pass
         
         if self.device == "cpu":
             console.print("[yellow]Warning: No GPU detected. Running on CPU (slower).[/yellow]")

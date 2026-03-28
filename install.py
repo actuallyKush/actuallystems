@@ -1,35 +1,22 @@
 #!/usr/bin/env python3
 """
-actuallystems - Universal Installer
-One command to install everything on any OS.
+actuallystems - Windows Installer
+One command to install everything on Windows.
 
 Usage:
-    curl -sL https://raw.githubusercontent.com/actuallyKush/actuallystems/main/install.py | python3
-    # OR
-    python3 https://raw.githubusercontent.com/actuallyKush/actuallystems/main/install.py
-
-Windows alternative (PowerShell):
     irm https://raw.githubusercontent.com/actuallyKush/actuallystems/main/install.py | python3
+    # OR
+    python3 -c "Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/actuallyKush/actuallystems/main/install.py' -OutFile 'install.py'; python3 install.py"
 """
 
 import os
 import sys
+import ssl
 import subprocess
 import platform
 import urllib.request
 import tempfile
 import shutil
-
-# Fix SSL certificate issues on macOS - use certifi bundle
-if sys.platform == "darwin":
-    try:
-        import certifi
-        cert_path = certifi.where()
-        os.environ['SSL_CERT_FILE'] = cert_path
-        os.environ['REQUESTS_CA_BUNDLE'] = cert_path
-        os.environ['CURL_CA_BUNDLE'] = cert_path
-    except ImportError:
-        pass
 
 REQUIREMENTS = [
     "demucs>=4.0.0",
@@ -41,18 +28,6 @@ REQUIREMENTS = [
 ]
 
 MIN_PYTHON = (3, 10)
-
-
-def get_os():
-    """Detect operating system."""
-    system = platform.system().lower()
-    if system == "darwin":
-        return "macos"
-    elif system == "linux":
-        return "linux"
-    elif system == "windows":
-        return "windows"
-    return system
 
 
 def check_python():
@@ -69,46 +44,25 @@ def check_python():
 def check_command(cmd):
     """Check if a command exists."""
     try:
-        if get_os() == "windows":
-            result = subprocess.run(["where", cmd], capture_output=True, text=True)
-        else:
-            result = subprocess.run(["which", cmd], capture_output=True, text=True)
+        result = subprocess.run(["where", cmd], capture_output=True, text=True)
         return result.returncode == 0
     except Exception:
         return False
 
 
 def install_ffmpeg():
-    """Install FFmpeg based on OS."""
-    os_name = get_os()
-    print(f"Installing FFmpeg on {os_name}...")
+    """Install FFmpeg on Windows."""
+    print("Installing FFmpeg on Windows...")
 
     try:
-        if os_name == "windows":
-            subprocess.run(["winget", "install", "ffmpeg", "--accept-source-agreements", "--accept-package-agreements"], check=True)
-        elif os_name == "macos":
-            subprocess.run(["brew", "install", "ffmpeg"], check=True)
-        elif os_name == "linux":
-            if shutil.which("apt"):
-                subprocess.run(["sudo", "apt", "install", "-y", "ffmpeg"], check=True)
-            elif shutil.which("yum"):
-                subprocess.run(["sudo", "yum", "install", "-y", "ffmpeg"], check=True)
-            elif shutil.which("dnf"):
-                subprocess.run(["sudo", "dnf", "install", "-y", "ffmpeg"], check=True)
-            elif shutil.which("pacman"):
-                subprocess.run(["sudo", "pacman", "-S", "--noconfirm", "ffmpeg"], check=True)
+        subprocess.run(["winget", "install", "ffmpeg", "--accept-source-agreements", "--accept-package-agreements"], check=True)
         print("FFmpeg installed successfully!")
         return True
     except Exception as e:
         print(f"Could not auto-install FFmpeg: {e}")
         print("\nPlease install FFmpeg manually:")
-        if os_name == "windows":
-            print("  winget install ffmpeg")
-        elif os_name == "macos":
-            print("  brew install ffmpeg")
-        elif os_name == "linux":
-            print("  sudo apt install ffmpeg    (Debian/Ubuntu)")
-            print("  sudo yum install ffmpeg    (Fedora)")
+        print("  winget install ffmpeg")
+        print("  OR download from https://ffmpeg.org/download.html")
         return False
 
 
@@ -133,17 +87,14 @@ def download_stems():
     url = "https://github.com/actuallyKush/actuallystems/archive/refs/heads/main.zip"
 
     try:
-        import ssl
         temp_dir = tempfile.mkdtemp()
         zip_path = os.path.join(temp_dir, "actuallystems.zip")
         
-        # Try urllib first, with SSL verification disabled for macOS certificate issues
-        try:
-            context = ssl._create_unverified_context()
+        context = ssl._create_unverified_context() if hasattr(ssl, '_create_unverified_context') else None
+        if context:
             urllib.request.urlretrieve(url, zip_path, context=context)
-        except Exception:
-            # Fallback: use curl which handles SSL better on macOS
-            subprocess.run(["curl", "-sL", "-o", zip_path, url], check=True)
+        else:
+            urllib.request.urlretrieve(url, zip_path)
         
         import zipfile
         with zipfile.ZipFile(zip_path, "r") as z:
@@ -165,7 +116,7 @@ def download_stems():
 
 def main():
     print("=" * 60)
-    print("  actuallystems - Universal Installer")
+    print("  actuallystems - Windows Installer")
     print("=" * 60)
     print()
 
@@ -174,9 +125,7 @@ def main():
     if not python_ok:
         print(f"Error: {python_error}")
         print("\nPlease install Python first:")
-        print("  Windows: winget install Python.Python.3.12")
-        print("  macOS:   brew install python3")
-        print("  Linux:   sudo apt install python3")
+        print("  winget install Python.Python.3.12")
         return 1
 
     print(f"Python version: {sys.version.split()[0]}")
@@ -218,7 +167,7 @@ def main():
     if install_path:
         print(f"  cd {install_path}")
         print("  python stems.py")
-    print("  OR (if installed via pip): stems")
+    print("  OR (if installed via pip): actuallystems")
     print()
     print("For help: https://github.com/actuallyKush/actuallystems")
     print()

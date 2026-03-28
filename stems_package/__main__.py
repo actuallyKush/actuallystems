@@ -1,22 +1,6 @@
 import sys
 import os
 
-# Fix SSL certificate issues on macOS - use certifi bundle
-if sys.platform == "darwin":
-    try:
-        import certifi
-        cert_path = certifi.where()
-        os.environ['SSL_CERT_FILE'] = cert_path
-        os.environ['REQUESTS_CA_BUNDLE'] = cert_path
-        os.environ['CURL_CA_BUNDLE'] = cert_path
-    except ImportError:
-        pass
-
-# Ensure stdin is a tty for Rich prompts
-if not sys.stdin.isatty():
-    import io
-    sys.stdin = io.TextIOWrapper(sys.stdin.buffer, errors='replace')
-
 from pathlib import Path
 from tkinter import filedialog
 import tkinter as tk

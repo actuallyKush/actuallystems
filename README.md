@@ -2,6 +2,11 @@
 
 A free, open-source CLI tool for music producers to separate audio into stems (vocals, drums, bass, synths).
 
+## Platform Support
+
+**Windows** - Full support  
+**macOS / Linux** - Under bug fixing (not officially supported)
+
 ## What is Stem Separation?
 
 Stem separation (also known as "demixing" or "source separation") is the process of splitting a complete audio mix into its individual components - typically vocals, drums, bass, and synths.
@@ -36,11 +41,6 @@ Stem separation (also known as "demixing" or "source separation") is the process
 ### One Command Install (Windows)
 ```powershell
 irm https://raw.githubusercontent.com/actuallyKush/actuallystems/main/install.py | python3
-```
-
-### One Command Install (Mac/Linux)
-```bash
-curl -sL https://raw.githubusercontent.com/actuallyKush/actuallystems/main/install.py | python3
 ```
 
 ### From Source
@@ -85,17 +85,10 @@ YourSong.mp3
 ### "FFmpeg is not installed"
 ```powershell
 winget install ffmpeg    # Windows
-brew install ffmpeg      # macOS
-sudo apt install ffmpeg  # Linux
 ```
 
 ### "No GPU detected - Running on CPU"
 This is normal. The tool will work but run slower on CPU. For faster processing, use a GPU with CUDA.
-
-### "TorchCodec errors"
-```bash
-pip install torchcodec
-```
 
 ## How It Works
 
